@@ -92,36 +92,34 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     start = problem.getStartState()
     if problem.isGoalState(start):
-        return []
+        return ['Stop']
+
     visited = {start:True}
-    successors = problem.getSuccessors(start)
-    for s in successors:
-        (r,acs) = dfsSolver(problem,s,visited)
-        if r:
-            acs.append(s[1])
-            acs.reverse()
-            print("solution:", acs)
-            return acs
+    (r, acs) = dfsSolver(problem, start, visited)
+    if r:
+        acs.reverse()
+        print("solution:", acs)
+        return acs
 
     print("no solutions")
     return []
 
 def dfsSolver(problem,state,visited):
-    if problem.isGoalState(state[0]):
+    if problem.isGoalState(state):
         return (True,['Stop'])
 
-    visited[state[0]] = True
-    successors = problem.getSuccessors(state[0])
+    visited[state] = True
+    successors = problem.getSuccessors(state)
     for s in successors:
         if (s[0] in visited and visited[s[0]]) :
             continue
 
-        (r,acs) = dfsSolver(problem,s,visited)
+        (r,acs) = dfsSolver(problem,s[0],visited)
         if r:
             acs.append(s[1])
-            visited[state[0]] =False
+            visited[state] =False
             return (True,acs)
-    visited[state[0]] = False
+    visited[state] = False
     return (False,[])
 
 def breadthFirstSearch(problem):
