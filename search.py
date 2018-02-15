@@ -125,7 +125,30 @@ def dfsSolver(problem,state,visited):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    p = bfsSolver(problem.getStartState(),problem)
+    print(p)
+    return p
+
+def bfsSolver(state,problem):
+    visited ={state:True}
+    q = util.Queue()
+    q.push((state,[]))
+    while not q.isEmpty():
+        r = q.pop()
+        if problem.isGoalState(r[0]):
+            r[1].append('Stop')
+            return r[1]
+        else:
+            successors = problem.getSuccessors(r[0])
+            for s in successors:
+                if s[0] not in visited:
+                    visited[s[0]]=True
+                    r1=[x for x in r[1]]
+                    r1.append(s[1])
+                    t = (s[0],r1)
+                    q.push(t)
+
+    return []
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
