@@ -190,8 +190,42 @@ def bfsSolver(state,problem):
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start = problem.getStartState()
+    if problem.isGoalState(start):
+        return ['Stop']
+
+    visited = {start:True}
+    #(r, acs) = dfsSolver(problem, start, visited)
+    print("start solving")
+    (r, acs,w) = dfsSolverMin(problem, start, visited)
+    if r:
+        acs.reverse()
+        print("solution:", w,acs)
+        return acs
+
+    print("no solutions")
+    return []
+
+def dfsSolverMin(problem,state,visited):
+    if problem.isGoalState(state):
+        return (True,['Stop'],0)
+
+    visited[state] = True
+    successors = problem.getSuccessors(state)
+    successors.reverse()
+    best = (False,[],-1)
+    for s in successors:
+        if (s[0] in visited and visited[s[0]]) :
+            continue
+
+        (r,acs,w) = dfsSolverMin(problem,s[0],visited)
+        if r:
+            if best[2]<0 or best[2] > w+s[2]:
+                acs.append(s[1])
+                best = (True,acs,w+s[2])
+
+    visited[state] = False
+    return best
 
 def nullHeuristic(state, problem=None):
     """
