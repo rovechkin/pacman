@@ -95,7 +95,8 @@ def depthFirstSearch(problem):
         return ['Stop']
 
     visited = {start:True}
-    (r, acs) = dfsSolver(problem, start, visited)
+    #(r, acs) = dfsSolver(problem, start, visited)
+    (r, acs) = dfsSolverStack(problem, start, visited)
     if r:
         acs.reverse()
         print("solution:", acs)
@@ -110,6 +111,7 @@ def dfsSolver(problem,state,visited):
 
     visited[state] = True
     successors = problem.getSuccessors(state)
+    successors.reverse()
     for s in successors:
         if (s[0] in visited and visited[s[0]]) :
             continue
@@ -120,6 +122,41 @@ def dfsSolver(problem,state,visited):
             visited[state] =False
             return (True,acs)
     visited[state] = False
+    return (False,[])
+
+
+def dfsSolverStack(problem,state,ignore):
+    visited={}
+    stack = util.Stack()
+    stack.push((state,'',-1))
+    visited[state] = True
+    while not stack.isEmpty():
+        (s,a,idx) = stack.pop()
+        if problem.isGoalState(s):
+            r=['Stop',a]
+            while not stack.isEmpty():
+                t = stack.pop()
+                if t[1] != '':
+                    r.append(t[1])
+            return (True,r)
+
+        # find the next child which is not visited
+        successors = problem.getSuccessors(s)
+        successors.reverse()
+        next = idx + 1
+        ss = successors[next] if next < len(successors) else None
+        while ss and ss[0] in visited and visited[ss[0]]:
+            next+=1
+            ss = successors[next] if next < len(successors) else None
+
+        if not ss:
+            continue
+
+        stack.push((s,a,next))
+        visited[ss[0]] = True
+        stack.push((ss[0],ss[1],-1))
+
+
     return (False,[])
 
 def breadthFirstSearch(problem):
@@ -140,6 +177,7 @@ def bfsSolver(state,problem):
             return r[1]
         else:
             successors = problem.getSuccessors(r[0])
+            successors.reverse()
             for s in successors:
                 if s[0] not in visited:
                     visited[s[0]]=True
