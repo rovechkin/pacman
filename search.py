@@ -119,9 +119,7 @@ def dfsSolver(problem,state,visited):
         (r,acs) = dfsSolver(problem,s[0],visited)
         if r:
             acs.append(s[1])
-            visited[state] =False
             return (True,acs)
-    visited[state] = False
     return (False,[])
 
 
