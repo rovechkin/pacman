@@ -156,7 +156,6 @@ def dfsSolverStack(problem,state,ignore):
         visited[ss[0]] = True
         stack.push((ss[0],ss[1],-1))
 
-
     return (False,[])
 
 def breadthFirstSearch(problem):
@@ -224,7 +223,6 @@ def dfsSolverMin(problem,state,visited):
                 acs.append(s[1])
                 best = (True,acs,w+s[2])
 
-    visited[state] = False
     return best
 
 def nullHeuristic(state, problem=None):
