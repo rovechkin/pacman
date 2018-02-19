@@ -192,9 +192,10 @@ def uniformCostSearch(problem):
         return ['Stop']
 
     visited = {start:True}
+    cached = {}
     #(r, acs) = dfsSolver(problem, start, visited)
     print("start solving")
-    (r, acs,w) = dfsSolverMin(problem, start, visited)
+    (r, acs,w) = dfsSolverMin(problem, start, visited,cached)
     if r:
         acs.reverse()
         print("solution:", w,acs)
@@ -203,9 +204,12 @@ def uniformCostSearch(problem):
     print("no solutions")
     return []
 
-def dfsSolverMin(problem,state,visited):
+def dfsSolverMin(problem,state,visited,cached):
     if problem.isGoalState(state):
         return (True,['Stop'],0)
+
+    if state in cached:
+        return cached[state]
 
     visited[state] = True
     successors = problem.getSuccessors(state)
@@ -215,12 +219,14 @@ def dfsSolverMin(problem,state,visited):
         if (s[0] in visited and visited[s[0]]) :
             continue
 
-        (r,acs,w) = dfsSolverMin(problem,s[0],visited)
+        (r,acs,w) = dfsSolverMin(problem,s[0],visited,cached)
         if r:
             if best[2]<0 or best[2] > w+s[2]:
                 acs.append(s[1])
                 best = (True,acs,w+s[2])
 
+    visited[state] = False
+    cached[state] = best
     return best
 
 def nullHeuristic(state, problem=None):
