@@ -288,7 +288,9 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
-        self.visited = (False,False,False,False)
+        self.food = {}
+        for c in self.corners:
+            self.food[c]=False
 
     def getStartState(self):
         """
@@ -296,14 +298,19 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        self.visited
+        start = self.startingPosition
+        corners = {}
+        for c in self.corners:
+            corners[c] = False
+        return (start,corners)
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        return sum([x for x in self.visited if x]) == 4
+        s= sum([1 for c,v in state[1].items() if v]) == 4
+        return  s
 
     def getSuccessors(self, state):
         """
@@ -317,14 +324,25 @@ class CornersProblem(search.SearchProblem):
         """
 
         successors = []
+        x, y = state[0]
+        print(state[0])
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
-            x,y = state
+
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
+
             if not self.walls[nextx][nexty]:
-                successors.append(state)
+                state1 = {}
+                for k in state[1]:
+                    state1[k] = state[1][k]
+                if (x, y) in self.corners:
+                    state1[(x, y)] = True
+                s = sum([1 for c, v in state1.items() if v]) == 4
+                if s:
+                    print("here")
+                successors.append((((nextx,nexty),state1),action,1))
 
             "*** YOUR CODE HERE ***"
 

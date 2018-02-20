@@ -159,7 +159,8 @@ def dfsSolverStack(problem,state,ignore):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    p = bfsSolver(problem.getStartState(),problem)
+    start = problem.getStartState()
+    p = bfsSolver(start,problem)
     print(p)
     return p
 
@@ -184,6 +185,41 @@ def bfsSolver(state,problem):
                     q.push(t)
 
     return []
+
+def breadthFirstSearchCorners(problem):
+    """Search the shallowest nodes in the search tree first."""
+    "*** YOUR CODE HERE ***"
+    print('start breadthFirstSearchCorners')
+    start = problem.getStartState()
+    p = bfsSolverCorners(start,problem)
+    print(p)
+    return p
+
+def bfsSolverCorners(state,problem):
+    visited ={str(state):True}
+    q = util.Queue()
+    q.push((state,[]))
+    while not q.isEmpty():
+        r = q.pop()
+        if problem.isGoalState(r[0]):
+            r[1].append('Stop')
+            return r[1]
+        else:
+            successors = problem.getSuccessors(r[0])
+            #successors.reverse()
+            for s in successors:
+                if str(s[0]) not in visited:
+                    visited[str(s[0])]=True
+                    r1=[x for x in r[1]]
+                    r1.append(s[1])
+                    s01={}
+                    for k in s[0][1]:
+                        s01[k] = s[0][1][k]
+                    t = ((s[0][0],s01),r1)
+                    q.push(t)
+
+    return []
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
@@ -282,6 +318,7 @@ def dfsSolverAstar(problem,state,visited,heuristic):
 
 # Abbreviations
 bfs = breadthFirstSearch
+bfs1 = breadthFirstSearchCorners
 dfs = depthFirstSearch
 astar = aStarSearch
 ucs = uniformCostSearch
