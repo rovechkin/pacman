@@ -92,11 +92,11 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     start = problem.getStartState()
     if problem.isGoalState(start):
-        return ['Stop']
+        return []
 
     visited = {start:True}
     #(r, acs) = dfsSolver(problem, start, visited)
-    (r, acs) = dfsSolverStack(problem, start, visited)
+    (r, acs) = dfsSolver(problem, start, visited)
     if r:
         acs.reverse()
         print("solution:", acs)
@@ -107,7 +107,7 @@ def depthFirstSearch(problem):
 
 def dfsSolver(problem,state,visited):
     if problem.isGoalState(state):
-        return (True,['Stop'])
+        return (True,[])
 
     visited[state] = True
     successors = problem.getSuccessors(state)
@@ -171,7 +171,6 @@ def bfsSolver(state,problem):
     while not q.isEmpty():
         r = q.pop()
         if problem.isGoalState(r[0]):
-            r[1].append('Stop')
             return r[1]
         else:
             successors = problem.getSuccessors(r[0])
@@ -190,13 +189,13 @@ def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     start = problem.getStartState()
     if problem.isGoalState(start):
-        return ['Stop']
+        return []
 
     visited = {start:True}
     cached = {}
     #(r, acs) = dfsSolver(problem, start, visited)
     print("uniformCostSearch: start solving")
-    (r, acs,w) = dfsSolverMin(problem, start, visited,cached)
+    (r, acs,w) = dfsSolverMin(problem, start, visited,cached,0)
     if r:
         acs.reverse()
         print("solution:", w,acs)
@@ -205,29 +204,33 @@ def uniformCostSearch(problem):
     print("no solutions")
     return []
 
-def dfsSolverMin(problem,state,visited,cached):
+def dfsSolverMin(problem,state,visited,cached,cost):
     if problem.isGoalState(state):
-        return (True,['Stop'],0)
+        return (True,[],cost)
 
-    if state in cached:
+    if state in cached and cached[state][2] > 0 and cost > cached[state][2]:
         return cached[state]
 
     visited[state] = True
     successors = problem.getSuccessors(state)
-    successors.reverse()
     best = (False,[],-1)
+
     for s in successors:
         if (s[0] in visited and visited[s[0]]) :
             continue
 
-        (r,acs,w) = dfsSolverMin(problem,s[0],visited,cached)
+        (r,acs,w) = dfsSolverMin(problem,s[0],visited,cached,cost + s[2])
         if r:
-            if best[2]<0 or best[2] > w+s[2]:
-                acs.append(s[1])
-                best = (True,acs,w+s[2])
+            if best[2]<0 or best[2] > w:
+                acs1=[x for x in acs]
+                acs1.append(s[1])
+                best = (True,acs1,w)
 
     visited[state] = False
-    cached[state] = best
+    if state[0] == 2 and state[1] == 1:
+        print('tot2', state, best[0], best[2])
+
+    cached[state] = (best[0],[x for x in best[1]],best[2])
     return best
 
 def nullHeuristic(state, problem=None):
