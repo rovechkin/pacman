@@ -227,9 +227,6 @@ def dfsSolverMin(problem,state,visited,cached,cost):
                 best = (True,acs1,w)
 
     visited[state] = False
-    if state[0] == 2 and state[1] == 1:
-        print('tot2', state, best[0], best[2])
-
     cached[state] = (best[0],[x for x in best[1]],best[2])
     return best
 
