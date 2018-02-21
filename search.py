@@ -195,7 +195,7 @@ def uniformCostSearch(problem):
     visited = {start:True}
     cached = {}
     #(r, acs) = dfsSolver(problem, start, visited)
-    print("start solving")
+    print("uniformCostSearch: start solving")
     (r, acs,w) = dfsSolverMin(problem, start, visited,cached)
     if r:
         acs.reverse()
@@ -246,7 +246,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
     visited = [start]
     #(r, acs) = dfsSolver(problem, start, visited)
-    print("start solving")
+    print("aStarSearch: start solving")
     (r, acs,w) = dfsSolverAstar(problem, start, visited,heuristic)
     if r:
         acs.reverse()
@@ -258,7 +258,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
 def dfsSolverAstar(problem,state,visited,heuristic):
     if problem.isGoalState(state):
-        return (True,['Stop'],0)
+        return (True,[],0)
 
     q = util.PriorityQueue()
 
@@ -277,6 +277,7 @@ def dfsSolverAstar(problem,state,visited,heuristic):
         (r,acs,w) = dfsSolverAstar(problem,s[0],visited,heuristic)
         if r:
             acs.append(s[1])
+            visited = [v for v in visited if state != v]
             return (True,acs,w+s[2])
     visited = [v for v in visited if state != v]
     return best
