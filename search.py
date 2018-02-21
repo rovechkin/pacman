@@ -258,7 +258,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
 def dfsSolverAstar(problem,state,visited,heuristic):
     if problem.isGoalState(state):
-        return (True,[],0)
+        return (True,[],1)
 
     q = util.PriorityQueue()
 
@@ -277,12 +277,13 @@ def dfsSolverAstar(problem,state,visited,heuristic):
         (r,acs,w) = dfsSolverAstar(problem,s[0],visited,heuristic)
         if r:
             if best[2]<0 or best[2] > w+s[2]:
-                print(s[1],w+s[2],best[2])
                 acs1 = [a for a in acs]
                 acs1.append(s[1])
                 best = (True,acs1,w+s[2])
 
     visited = [v for v in visited if state != v]
+    if best[0]:
+        print(state[0],best[0],best[2])
     return best
 
 # Abbreviations
