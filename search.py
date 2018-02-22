@@ -159,35 +159,46 @@ def dfsSolverStack(problem,state,ignore):
 def dfsSolverStackMin(problem,state,ignore):
     visited={}
     stack = util.Stack()
-    stack.push((state,'',-1))
-    visited[state] = True
+    stack.push((state,'',0,-1))
+    visited[str(state)] = True
+    best = (False,[],-1)
     while not stack.isEmpty():
-        (s,a,idx) = stack.pop()
+        (s,a,w,idx) = stack.pop()
+        visited[str(s)] = False
         if problem.isGoalState(s):
-            r=['Stop',a]
-            while not stack.isEmpty():
-                t = stack.pop()
-                if t[1] != '':
-                    r.append(t[1])
-            return (True,r)
+            if a!='':
+                r=[a]
+            else:
+                r=[]
+            tot = w
+            l = [x for x in stack.list]
+            l.reverse()
+            for e in l:
+                if e[1]!='':
+                    r.append(e[1])
+                    tot+=e[2]
+            if  best[2] <0 or tot < best[2]:
+                best = (True,r,tot)
+            continue
 
         # find the next child which is not visited
         successors = problem.getSuccessors(s)
         successors.reverse()
         next = idx + 1
         ss = successors[next] if next < len(successors) else None
-        while ss and ss[0] in visited and visited[ss[0]]:
+        while ss and str(ss[0]) in visited and visited[str(ss[0])]:
             next+=1
             ss = successors[next] if next < len(successors) else None
 
         if not ss:
             continue
 
-        stack.push((s,a,next))
-        visited[ss[0]] = True
-        stack.push((ss[0],ss[1],-1))
+        stack.push((s,a,w,next))
+        visited[str(s)] = True
+        visited[str(ss[0])] = True
+        stack.push((ss[0],ss[1],ss[2],-1))
 
-    return (False,[])
+    return best
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
@@ -229,7 +240,8 @@ def uniformCostSearch(problem):
     cached = {}
     #(r, acs) = dfsSolver(problem, start, visited)
     print("uniformCostSearch: start solving")
-    (r, acs,w) = dfsSolverMin(problem, start, visited,cached,0)
+    #(r, acs,w) = dfsSolverMin(problem, start, visited,cached,0)
+    (r, acs, w) = dfsSolverStackMin(problem, start, visited)
     if r:
         acs.reverse()
         print("solution:", w,acs)
