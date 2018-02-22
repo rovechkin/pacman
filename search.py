@@ -131,7 +131,7 @@ def dfsSolverStack(problem,state,ignore):
     while not stack.isEmpty():
         (s,a,idx) = stack.pop()
         if problem.isGoalState(s):
-            r=['Stop',a]
+            r=[a]
             while not stack.isEmpty():
                 t = stack.pop()
                 if t[1] != '':
@@ -164,7 +164,6 @@ def dfsSolverStackMin(problem,state,ignore):
     best = (False,[],-1)
     while not stack.isEmpty():
         (s,a,w,idx) = stack.pop()
-        visited[str(s)] = False
         if problem.isGoalState(s):
             if a!='':
                 r=[a]
@@ -194,7 +193,6 @@ def dfsSolverStackMin(problem,state,ignore):
             continue
 
         stack.push((s,a,w,next))
-        visited[str(s)] = True
         visited[str(ss[0])] = True
         stack.push((ss[0],ss[1],ss[2],-1))
 
