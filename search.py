@@ -244,10 +244,10 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     if problem.isGoalState(start):
         return ['Stop']
 
-    visited = [start]
-    #(r, acs) = dfsSolver(problem, start, visited)
+    visited = {}
+
     print("aStarSearch: start solving")
-    (r, acs,w) = dfsSolverAstar(problem, start, visited,heuristic)
+    (r, acs,w) = dfsSolverAstar(problem, start, visited,heuristic,0)
     if r:
         acs.reverse()
         print("solution:", w,acs)
@@ -256,13 +256,13 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     print("no solutions")
     return []
 
-def dfsSolverAstar(problem,state,visited,heuristic):
+def dfsSolverAstar(problem,state,visited,heuristic,cost):
     if problem.isGoalState(state):
-        return (True,[],1)
+        return (True,[],cost)
 
     q = util.PriorityQueue()
 
-    visited.append(state)
+    visited[str(state)] = True
     successors = problem.getSuccessors(state)
     for s in successors:
         w = heuristic(s[0],problem)
@@ -271,19 +271,17 @@ def dfsSolverAstar(problem,state,visited,heuristic):
     best = (False,[],-1)
     while not q.isEmpty():
         s = q.pop()
-        if (s[0] in visited ) :
+        if (str(s[0]) in visited and visited[str(s[0])] ) :
             continue
 
-        (r,acs,w) = dfsSolverAstar(problem,s[0],visited,heuristic)
+        (r,acs,w) = dfsSolverAstar(problem,s[0],visited,heuristic,cost + s[2])
         if r:
-            if best[2]<0 or best[2] > w+s[2]:
+            if best[2]<0 or best[2] > w:
                 acs1 = [a for a in acs]
                 acs1.append(s[1])
-                best = (True,acs1,w+s[2])
+                best = (True,acs1,w)
 
-    visited = [v for v in visited if state != v]
-    if best[0]:
-        print(state[0],best[0],best[2])
+    visited[str(state)] = False
     return best
 
 # Abbreviations
