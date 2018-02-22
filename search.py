@@ -164,6 +164,7 @@ def dfsSolverStackMin(problem,state,ignore):
     best = (False,[],-1)
     while not stack.isEmpty():
         (s,a,w,idx) = stack.pop()
+        visited[str(s)] = False
         if problem.isGoalState(s):
             if a!='':
                 r=[a]
@@ -193,6 +194,7 @@ def dfsSolverStackMin(problem,state,ignore):
             continue
 
         stack.push((s,a,w,next))
+        visited[str(s)] = True
         visited[str(ss[0])] = True
         stack.push((ss[0],ss[1],ss[2],-1))
 
@@ -237,8 +239,8 @@ def uniformCostSearch(problem):
     visited = {}
     #(r, acs) = dfsSolver(problem, start, visited)
     print("uniformCostSearch: start solving")
-    (r, acs,w) = dfsSolverMin(problem, start, visited,0)
-    #(r, acs, w) = dfsSolverStackMin(problem, start, visited)
+    #(r, acs,w) = dfsSolverMin(problem, start, visited,0)
+    (r, acs, w) = dfsSolverStackMin(problem, start, visited)
     if r:
         acs.reverse()
         print("solution:", w,acs)
@@ -251,7 +253,10 @@ def dfsSolverMin(problem,state,visited,cost):
     if problem.isGoalState(state):
         return (True,[],cost)
 
-    visited[str(state)] = 1
+    if str(state) not in visited:
+        visited[str(state)] = 1
+    else:
+        visited[str(state)] += 1
 
     successors = problem.getSuccessors(state)
     best = (False,[],-1)
@@ -266,7 +271,7 @@ def dfsSolverMin(problem,state,visited,cost):
                 acs1=[x for x in acs]
                 acs1.append(s[1])
                 best = (True,acs1,w)
-
+    visited[str(state)] -= 1
     return best
 
 def nullHeuristic(state, problem=None):
