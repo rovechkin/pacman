@@ -235,10 +235,9 @@ def uniformCostSearch(problem):
         return []
 
     visited = {}
-    cached = {}
     #(r, acs) = dfsSolver(problem, start, visited)
     print("uniformCostSearch: start solving")
-    (r, acs,w) = dfsSolverMin(problem, start, visited,cached,0)
+    (r, acs,w) = dfsSolverMin(problem, start, visited,0)
     #(r, acs, w) = dfsSolverStackMin(problem, start, visited)
     if r:
         acs.reverse()
@@ -248,12 +247,9 @@ def uniformCostSearch(problem):
     print("no solutions")
     return []
 
-def dfsSolverMin(problem,state,visited,cached,cost):
+def dfsSolverMin(problem,state,visited,cost):
     if problem.isGoalState(state):
         return (True,[],cost)
-
-    if str(state) in cached and cached[str(state)][2] > 0 and cost > cached[str(state)][2]:
-        return cached[str(state)]
 
     visited[str(state)] = 1
 
@@ -264,15 +260,13 @@ def dfsSolverMin(problem,state,visited,cached,cost):
         if (str(s[0]) in visited and visited[str(s[0])] >0) :
             continue
 
-        (r,acs,w) = dfsSolverMin(problem,s[0],visited,cached,cost + s[2])
+        (r,acs,w) = dfsSolverMin(problem,s[0],visited,cost + s[2])
         if r:
             if best[2]<0 or best[2] > w:
                 acs1=[x for x in acs]
                 acs1.append(s[1])
                 best = (True,acs1,w)
 
-    visited[str(state)] = 0
-    cached[str(state)] = (best[0],[x for x in best[1]],best[2])
     return best
 
 def nullHeuristic(state, problem=None):
@@ -290,10 +284,9 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         return ['Stop']
 
     visited = {}
-    cached ={}
 
     print("aStarSearch: start solving",start)
-    (r, acs,w) = dfsSolverAstar(problem, start, visited,cached,heuristic,0)
+    (r, acs,w) = dfsSolverAstar(problem, start, visited,heuristic,0)
     if r:
         acs.reverse()
         print("solution:", w,acs)
@@ -302,18 +295,13 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     print("no solutions")
     return []
 
-def dfsSolverAstar(problem,state,visited,cached,heuristic,cost):
+def dfsSolverAstar(problem,state,visited,heuristic,cost):
     if (str(state) in visited and visited[str(state)] > 0):
         return (False, [], -1)
 
     if problem.isGoalState(state):
         return (True,[],cost)
 
-
-
-    if str(state) in cached and cached[str(state)][2] > 0 and cost > cached[str(state)][2]:
-        print(cached[str(state)][2])
-        return cached[str(state)]
 
     visited[str(state)] = 1
 
@@ -336,14 +324,13 @@ def dfsSolverAstar(problem,state,visited,cached,heuristic,cost):
 
         last = h
 
-        (r,acs,w) = dfsSolverAstar(problem,s[0],visited,cached,heuristic,cost + s[2])
+        (r,acs,w) = dfsSolverAstar(problem,s[0],visited,heuristic,cost + s[2])
         if r:
             if best[2]<0 or best[2] > w:
                 acs1=[x for x in acs]
                 acs1.append(s[1])
                 best = (True,acs1,w)
 
-    cached[str(state)] = (best[0],[x for x in best[1]],best[2])
     return best
 
 # Abbreviations
