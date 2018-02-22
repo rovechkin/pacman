@@ -238,8 +238,8 @@ def uniformCostSearch(problem):
     cached = {}
     #(r, acs) = dfsSolver(problem, start, visited)
     print("uniformCostSearch: start solving")
-    #(r, acs,w) = dfsSolverMin(problem, start, visited,cached,0)
-    (r, acs, w) = dfsSolverStackMin(problem, start, visited)
+    (r, acs,w) = dfsSolverMin(problem, start, visited,cached,0)
+    #(r, acs, w) = dfsSolverStackMin(problem, start, visited)
     if r:
         acs.reverse()
         print("solution:", w,acs)
@@ -255,10 +255,7 @@ def dfsSolverMin(problem,state,visited,cached,cost):
     if str(state) in cached and cached[str(state)][2] > 0 and cost > cached[str(state)][2]:
         return cached[str(state)]
 
-    if str(state) in visited:
-        visited[str(state)] += 1
-    else:
-        visited[str(state)] = 1
+    visited[str(state)] = 1
 
     successors = problem.getSuccessors(state)
     best = (False,[],-1)
@@ -273,9 +270,8 @@ def dfsSolverMin(problem,state,visited,cached,cost):
                 acs1=[x for x in acs]
                 acs1.append(s[1])
                 best = (True,acs1,w)
-                print(state[0],best[2])
 
-    visited[str(state)] -= 1
+    visited[str(state)] = 0
     cached[str(state)] = (best[0],[x for x in best[1]],best[2])
     return best
 
@@ -319,10 +315,7 @@ def dfsSolverAstar(problem,state,visited,cached,heuristic,cost):
         print(cached[str(state)][2])
         return cached[str(state)]
 
-    if str(state) in visited:
-        visited[str(state)] += 1
-    else:
-        visited[str(state)] = 1
+    visited[str(state)] = 1
 
     q = util.PriorityQueue()
     successors = problem.getSuccessors(state)
@@ -350,7 +343,6 @@ def dfsSolverAstar(problem,state,visited,cached,heuristic,cost):
                 acs1.append(s[1])
                 best = (True,acs1,w)
 
-    visited[str(state)] -= 1
     cached[str(state)] = (best[0],[x for x in best[1]],best[2])
     return best
 
