@@ -96,7 +96,7 @@ def depthFirstSearch(problem):
 
     visited = {start:True}
     #(r, acs) = dfsSolver(problem, start, visited)
-    (r, acs) = dfsSolver(problem, start, visited)
+    (r, acs) = dfsSolverStack(problem, start, visited)
     if r:
         acs.reverse()
         print("solution:", acs)
@@ -156,10 +156,44 @@ def dfsSolverStack(problem,state,ignore):
 
     return (False,[])
 
+def dfsSolverStackMin(problem,state,ignore):
+    visited={}
+    stack = util.Stack()
+    stack.push((state,'',-1))
+    visited[state] = True
+    while not stack.isEmpty():
+        (s,a,idx) = stack.pop()
+        if problem.isGoalState(s):
+            r=['Stop',a]
+            while not stack.isEmpty():
+                t = stack.pop()
+                if t[1] != '':
+                    r.append(t[1])
+            return (True,r)
+
+        # find the next child which is not visited
+        successors = problem.getSuccessors(s)
+        successors.reverse()
+        next = idx + 1
+        ss = successors[next] if next < len(successors) else None
+        while ss and ss[0] in visited and visited[ss[0]]:
+            next+=1
+            ss = successors[next] if next < len(successors) else None
+
+        if not ss:
+            continue
+
+        stack.push((s,a,next))
+        visited[ss[0]] = True
+        stack.push((ss[0],ss[1],-1))
+
+    return (False,[])
+
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     start = problem.getStartState()
+    print("bfs",start   )
     p = bfsSolver(start,problem)
     print(p)
     return p
@@ -211,7 +245,7 @@ def dfsSolverMin(problem,state,visited,cached,cost):
     if str(state) in cached and cached[str(state)][2] > 0 and cost > cached[str(state)][2]:
         return cached[str(state)]
 
-    if state in visited:
+    if str(state) in visited:
         visited[str(state)] += 1
     else:
         visited[str(state)] = 1
@@ -229,6 +263,7 @@ def dfsSolverMin(problem,state,visited,cached,cost):
                 acs1=[x for x in acs]
                 acs1.append(s[1])
                 best = (True,acs1,w)
+                print(state[0],best[2])
 
     visited[str(state)] -= 1
     cached[str(state)] = (best[0],[x for x in best[1]],best[2])
@@ -251,7 +286,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     visited = {}
     cached ={}
 
-    print("aStarSearch: start solving")
+    print("aStarSearch: start solving",start)
     (r, acs,w) = dfsSolverAstar(problem, start, visited,cached,heuristic,0)
     if r:
         acs.reverse()
@@ -262,25 +297,43 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     return []
 
 def dfsSolverAstar(problem,state,visited,cached,heuristic,cost):
+    if (str(state) in visited and visited[str(state)] > 0):
+        return (False, [], -1)
+
     if problem.isGoalState(state):
         return (True,[],cost)
 
+
+
     if str(state) in cached and cached[str(state)][2] > 0 and cost > cached[str(state)][2]:
+        print(cached[str(state)][2])
         return cached[str(state)]
 
-    if state in visited:
+    if str(state) in visited:
         visited[str(state)] += 1
     else:
         visited[str(state)] = 1
 
+    q = util.PriorityQueue()
     successors = problem.getSuccessors(state)
-    best = (False,[],-1)
-
     for s in successors:
-        if (str(s[0]) in visited and visited[str(s[0])] >0) :
+        h = heuristic(s[0],problem)
+        q.update((s,h),h)
+
+    best = (False,[],-1)
+    last = None
+    while not q.isEmpty():
+        s,h = q.pop()
+
+        if last is not None and h > last and best[0]:
+            break
+
+        if (str(s[0]) in visited and visited[str(s[0])] > 0):
             continue
 
-        (r,acs,w) = dfsSolverMin(problem,s[0],visited,cached,cost + s[2])
+        last = h
+
+        (r,acs,w) = dfsSolverAstar(problem,s[0],visited,cached,heuristic,cost + s[2])
         if r:
             if best[2]<0 or best[2] > w:
                 acs1=[x for x in acs]
@@ -289,35 +342,6 @@ def dfsSolverAstar(problem,state,visited,cached,heuristic,cost):
 
     visited[str(state)] -= 1
     cached[str(state)] = (best[0],[x for x in best[1]],best[2])
-    return best
-
-def dfsSolverAstar1(problem,state,visited,heuristic,cost):
-    print(state)
-    if problem.isGoalState(state):
-        return (True,[],cost)
-
-    q = util.PriorityQueue()
-
-    visited[str(state)] = True
-    successors = problem.getSuccessors(state)
-    for s in successors:
-        w = heuristic(s[0],problem)
-        q.update(s,w)
-
-    best = (False,[],-1)
-    while not q.isEmpty():
-        s = q.pop()
-        if (str(s[0]) in visited and visited[str(s[0])] ) :
-            continue
-
-        (r,acs,w) = dfsSolverAstar(problem,s[0],visited,heuristic,cost + s[2])
-        if r:
-            if best[2]<0 or best[2] > w:
-                acs1 = [a for a in acs]
-                acs1.append(s[1])
-                best = (True,acs1,w)
-
-    visited[str(state)] = False
     return best
 
 # Abbreviations
